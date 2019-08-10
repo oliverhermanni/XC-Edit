@@ -1,0 +1,209 @@
+object FormOptions: TFormOptions
+  Left = 398
+  Height = 421
+  Top = 366
+  Width = 581
+  BorderIcons = []
+  BorderStyle = bsDialog
+  Caption = 'Options'
+  ClientHeight = 421
+  ClientWidth = 581
+  FormStyle = fsStayOnTop
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '2.0.2.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 45
+    Top = 376
+    Width = 581
+    Align = alBottom
+    BorderStyle = bsSingle
+    ClientHeight = 41
+    ClientWidth = 577
+    TabOrder = 0
+    object ButtonOk: TButton
+      Left = 408
+      Height = 25
+      Top = 8
+      Width = 75
+      Caption = '&OK'
+      OnClick = ButtonOkClick
+      TabOrder = 0
+    end
+    object ButtonCancel: TButton
+      Left = 496
+      Height = 25
+      Top = 8
+      Width = 75
+      Caption = '&Cancel'
+      OnClick = ButtonCancelClick
+      TabOrder = 1
+    end
+  end
+  object PageControl: TPageControl
+    Left = 226
+    Height = 376
+    Top = 0
+    Width = 355
+    ActivePage = TabSheet1
+    Align = alClient
+    TabIndex = 0
+    TabOrder = 1
+    object TabSheet1: TTabSheet
+      Caption = 'XC=BASIC'
+      ClientHeight = 348
+      ClientWidth = 347
+      object GroupBox1: TGroupBox
+        Left = 10
+        Height = 328
+        Top = 10
+        Width = 327
+        Align = alClient
+        BorderSpacing.Around = 10
+        Caption = 'XC=BASIC Settings'
+        ClientHeight = 308
+        ClientWidth = 323
+        TabOrder = 0
+        object fneMainCompiler: TFileNameEdit
+          Left = 8
+          Height = 23
+          Top = 24
+          Width = 312
+          FilterIndex = 0
+          HideDirectories = False
+          ButtonWidth = 23
+          NumGlyphs = 1
+          Images = FormMain.ImageList
+          ImageIndex = 2
+          MaxLength = 0
+          TabOrder = 0
+        end
+        object Label1: TLabel
+          Left = 8
+          Height = 15
+          Top = 8
+          Width = 77
+          Caption = 'Main compiler'
+          ParentColor = False
+        end
+        object Label2: TLabel
+          Left = 8
+          Height = 15
+          Top = 80
+          Width = 71
+          Caption = 'Test compiler'
+          ParentColor = False
+        end
+        object fneTestCompiler: TFileNameEdit
+          Left = 8
+          Height = 23
+          Top = 96
+          Width = 312
+          FilterIndex = 0
+          HideDirectories = False
+          ButtonWidth = 23
+          NumGlyphs = 1
+          Images = FormMain.ImageList
+          ImageIndex = 2
+          MaxLength = 0
+          TabOrder = 1
+        end
+        object Label3: TLabel
+          Left = 8
+          Height = 48
+          Top = 120
+          Width = 280
+          AutoSize = False
+          Caption = 'Here you can set a different version of XC=BASIC, if you need it for testing purposes (eg. the latest dev build).'
+          ParentColor = False
+          WordWrap = True
+        end
+        object Label4: TLabel
+          Left = 8
+          Height = 15
+          Top = 48
+          Width = 166
+          Caption = 'Location of the xcb batch script'
+          ParentColor = False
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Emulator'
+      ClientHeight = 348
+      ClientWidth = 347
+      object GroupBox2: TGroupBox
+        Left = 10
+        Height = 328
+        Top = 10
+        Width = 327
+        Align = alClient
+        BorderSpacing.Around = 10
+        Caption = 'Emulator settings'
+        ClientHeight = 308
+        ClientWidth = 323
+        TabOrder = 0
+        object fneEmulatorLocation: TFileNameEdit
+          Left = 8
+          Height = 23
+          Top = 24
+          Width = 312
+          FilterIndex = 0
+          HideDirectories = False
+          ButtonWidth = 23
+          NumGlyphs = 1
+          Images = FormMain.ImageList
+          ImageIndex = 2
+          MaxLength = 0
+          TabOrder = 0
+        end
+        object Label5: TLabel
+          Left = 8
+          Height = 15
+          Top = 8
+          Width = 98
+          Caption = 'Emulator and path'
+          ParentColor = False
+        end
+        object EditEmulatorParams: TEdit
+          Left = 8
+          Height = 23
+          Top = 88
+          Width = 312
+          TabOrder = 1
+        end
+        object Label6: TLabel
+          Left = 8
+          Height = 15
+          Top = 72
+          Width = 90
+          Caption = 'Emulator params'
+          ParentColor = False
+        end
+      end
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 376
+    Top = 0
+    Width = 226
+    Align = alLeft
+    BorderWidth = 10
+    Caption = 'Panel2'
+    ClientHeight = 376
+    ClientWidth = 226
+    TabOrder = 2
+    object ListBoxTabs: TListBox
+      Left = 11
+      Height = 354
+      Top = 11
+      Width = 204
+      Align = alClient
+      ItemHeight = 0
+      OnClick = ListBoxTabsClick
+      TabOrder = 0
+    end
+  end
+end
