@@ -6,18 +6,18 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
-  ComCtrls, ExtCtrls, StdCtrls, SynEdit, INIFiles, options, attabs;
+  ComCtrls, ExtCtrls, StdCtrls, SynEdit, INIFiles, Process, LazFileUtils,
+  SynHighlighterXML, options, JvRollOut, RichMemo, SynFacilHighlighter;
 
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
-    Editor: TSynEdit;
-    tabsEditor: TATTabs;
     ImageList: TImageList;
     ImageListBookmark: TImageList;
-    ListBox1: TListBox;
+    richOutput: TRichMemo;
+    RolloutOutput: TJvRollOut;
     MainMenu: TMainMenu;
     MenuFile: TMenuItem;
     MenuFileNew: TMenuItem;
@@ -35,19 +35,22 @@ type
     MenuEditReplace: TMenuItem;
     MenuEditOptions: TMenuItem;
     MenuEditClose: TMenuItem;
+    MenuProjectRun: TMenuItem;
+    MenuProject: TMenuItem;
     N4: TMenuItem;
     N3: TMenuItem;
     N2: TMenuItem;
     N1: TMenuItem;
     OpenDialog: TOpenDialog;
     PageControl1: TPageControl;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
+    PageControl2: TPageControl;
+    pagesEditor: TPageControl;
     SaveDialog: TSaveDialog;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     StatusBar: TStatusBar;
+    TabOutput: TTabSheet;
+    tabErrorWarnings: TTabSheet;
     ToolBar: TToolBar;
     tbNew: TToolButton;
     tbOpen: TToolButton;
@@ -55,15 +58,18 @@ type
     tbRedo: TToolButton;
     tbCopy: TToolButton;
     tbPaste: TToolButton;
+    ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     tbUndo: TToolButton;
     tbCut: TToolButton;
-    procedure EditorChange(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    tbFind: TToolButton;
+    tbReplace: TToolButton;
+    ToolButton6: TToolButton;
+    tbRun: TToolButton;
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
-    procedure MenuEditCutClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure MenuEditCutDrawItem(Sender: TObject; ACanvas: TCanvas;
       ARect: TRect; AState: TOwnerDrawState);
     procedure MenuEditOptionsClick(Sender: TObject);
@@ -73,18 +79,25 @@ type
     procedure MenuFileOpenClick(Sender: TObject);
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
+    procedure MenuProjectClick(Sender: TObject);
+    procedure MenuProjectRunClick(Sender: TObject);
+    procedure pagesEditorChange(Sender: TObject);
+    procedure tabsEditorTabClick(Sender: TObject);
+    procedure tbRunClick(Sender: TObject);
   private
-    sFilename: string;
-    procedure SetFilename(FName: string);
   public
-    property Filename: string read sFilename write SetFilename;
+    FilenameIdx: Longint;
+    StrFilenames: array[0..99999] of string;
+    function ActiveEditor: TSynEdit;
     function SaveEditor(WithDialog: boolean): boolean;
     procedure ReadIniFile;
     procedure SaveIniFile;
+    procedure CreateNewTab;
   end;
 
 var
   FormMain: TFormMain;
+  hlt : TSynFacilSyn;
 
 implementation
 
@@ -93,63 +106,22 @@ implementation
 { TFormMain }
 
 procedure TFormMain.MenuFileNewClick(Sender: TObject);
-var tab: TTabSheet;
-    SaveDoc: LongInt;
-    NewConfirmed: boolean;
-    var i: integer;
 begin
-  i := tabsEditor.TabIndex+1;
-  tabsEditor.AddTab(i, 'New file');
-  tabsEditor.TabIndex:=i;
-  {{
-  NewConfirmed := true;
-  if Editor.Modified then
-  begin
-    NewConfirmed := false;
-    SaveDoc := Application.MessageBox('Do you want to save your latest changes?', 'Editor modified',  MB_ICONQUESTION + MB_YESNOCANCEL);
-    case SaveDoc of
-      ID_YES:
-          NewConfirmed := SaveEditor(false);
-      ID_NO:
-          NewConfirmed := true;
-      ID_CANCEL:
-          NewConfirmed := false;
-    end;
-  end;
-  if NewConfirmed then
-  begin
-    Editor.Lines.Clear;
-    Editor.Modified := false;
-  end;
-  }}
+ CreateNewTab;
 end;
 
 procedure TFormMain.MenuFileOpenClick(Sender: TObject);
-var SaveDoc: LongInt;
-    OpenConfirmed: boolean;
+var Filename: string;
 begin
-  {{
-  OpenConfirmed := true;
-  if Editor.Modified then
+  if OpenDialog.Execute then
   begin
-    OpenConfirmed := false;
-    SaveDoc := Application.MessageBox('Do you want to save your latest changes?', 'Editor modified',  MB_ICONQUESTION + MB_YESNOCANCEL);
-    case SaveDoc of
-      ID_YES:
-          OpenConfirmed := SaveEditor(false);
-      ID_NO:
-          OpenConfirmed := true;
-      ID_CANCEL:
-          OpenConfirmed := false;
-    end;
+    if ActiveEditor.Modified then CreateNewTab;
+    Filename := OpenDialog.Filename;
+    ActiveEditor.Lines.LoadFromFile(Filename);
+    pagesEditor.ActivePage.Caption := ExtractFileName(Filename);
+    StrFilenames[ActiveEditor.Tag] := Filename;
+    StatusBar.Panels[0].Text:= StrFilenames[ActiveEditor.Tag];
   end;
-  if OpenConfirmed then
-    if OpenDialog.Execute then
-    begin
-      Filename := OpenDialog.Filename;
-      Editor.Lines.LoadFromFile(Filename);
-    end;
-    }}
 end;
 
 procedure TFormMain.MenuFileSaveAsClick(Sender: TObject);
@@ -162,12 +134,58 @@ begin
   SaveEditor(false);
 end;
 
+procedure TFormMain.MenuProjectClick(Sender: TObject);
+begin
+
+end;
+
+procedure TFormMain.MenuProjectRunClick(Sender: TObject);
+var Run: TProcess;
+    Ini : TIniFile;
+    AStringList : TStringList;
+    Compiler, SourceToCompile, DestFilename: String;
+begin
+  AStringList := TStringList.Create;
+  Ini := TIniFile.Create(GetAppConfigFile(false));
+  Compiler := Ini.ReadString('XCBASIC', 'MainCompiler','');
+//  Compiler := 'C:\Windows\System32\calc.exe';
+  SourceToCompile := StrFilenames[ActiveEditor.Tag];
+  DestFilename := ExtractFileNameWithoutExt(SourceToCompile) + '.prg';
+  richOutput.Lines.Add('*** Compile process started ***');
+  Run := TProcess.Create(nil);
+  Run.CurrentDirectory:= ExtractFilePath(Compiler);
+  Run.Executable := Compiler;
+  Run.Parameters.Add(SourceToCompile);
+  Run.Parameters.Add(DestFilename);
+  Run.Options := Run.Options + [poWaitOnExit, poUsePipes];
+  Run.Execute;
+  AStringList.LoadFromStream(Run.Output);
+  richOutput.Lines.AddStrings(AStringList);
+  AStringList.LoadFromStream(Run.Stderr);
+  richOutput.Lines.AddStrings(AStringList);
+  Run.Free;
+end;
+
+procedure TFormMain.pagesEditorChange(Sender: TObject);
+begin
+  StatusBar.Panels[0].Text:= StrFilenames[ActiveEditor.Tag];
+end;
+
+procedure TFormMain.tabsEditorTabClick(Sender: TObject);
+begin
+
+end;
+
+procedure TFormMain.tbRunClick(Sender: TObject);
+begin
+
+end;
+
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 var SaveDoc: LongInt;
 begin
-  {{
   CanClose := true;
-  if Editor.Modified then
+  if ActiveEditor.Modified then
   begin
     CanClose := false;
     SaveDoc := Application.MessageBox('Do you want to save your latest changes?', 'Editor modified',  MB_ICONQUESTION + MB_YESNO);
@@ -178,23 +196,26 @@ begin
           CanClose := true;
     end;
   end;
-  }}
+    SaveIniFile;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
+  FilenameIdx:=-1;
   ReadIniFile;
+  hlt := TSynFacilSyn.Create(Self);
+  hlt.LoadFromFile(ExtractFilePath(Application.ExeName) + DirectorySeparator + 'synxcbasic.xml');
 end;
 
-procedure TFormMain.MenuEditCutClick(Sender: TObject);
+procedure TFormMain.FormShow(Sender: TObject);
 begin
-
+  CreateNewTab;
 end;
 
 procedure TFormMain.MenuEditCutDrawItem(Sender: TObject; ACanvas: TCanvas;
   ARect: TRect; AState: TOwnerDrawState);
 begin
-
+  MenuEditCut.Enabled:= ActiveEditor.SelAvail;
 end;
 
 procedure TFormMain.MenuEditOptionsClick(Sender: TObject);
@@ -202,45 +223,31 @@ begin
   FormOptions.Show;
 end;
 
-procedure TFormMain.EditorChange(Sender: TObject);
-begin
-
-end;
-
-procedure TFormMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-begin
-  SaveIniFile;
-end;
-
 procedure TFormMain.MenuEditRedoClick(Sender: TObject);
 begin
-//  Editor.Redo;
+//  ActiveEditor.Redo
 end;
 
 procedure TFormMain.MenuEditUndoClick(Sender: TObject);
 begin
-//  Editor.Undo;
+// ActiveEditor.Undo
 end;
 
 function TFormMain.SaveEditor(WithDialog: boolean): boolean;
+var Filename : string;
 begin
-  {{
+  Filename := StrFilenames[ActiveEditor.Tag];
   if Filename = '' then WithDialog := true;
   if WithDialog then
   begin
-    If SaveDialog.Execute = false then
-      exit(false);
-    Filename := SaveDialog.Filename;
+    If SaveDialog.Execute = false then exit(false);
+    StrFilenames[ActiveEditor.Tag] := SaveDialog.Filename;
+    pagesEditor.ActivePage.Caption:= ExtractFilename(SaveDialog.Filename);
   end;
-  Editor.Lines.SaveToFile(Filename);
-  Editor.Modified := false;
+  ActiveEditor.Lines.SaveToFile(Filename);
+  ActiveEditor.Modified := false;
   result := true;
-  }}
-end;
-
-procedure TFormMain.SetFilename(FName: string);
-begin
-  sFilename:=FName;
+  StatusBar.Panels[0].Text:= StrFilenames[ActiveEditor.Tag];
 end;
 
 procedure TFormMain.ReadIniFile;
@@ -274,5 +281,32 @@ begin
   end;
 end;
 
-end.
+function TFormMain.ActiveEditor:TSynEdit;
+begin
+ result := TSynEdit(pagesEditor.ActivePage.FindComponent('Editor'));
+end;
 
+procedure TFormMain.CreateNewTab;
+var tab: TTabSheet;
+    Editor: TSynEdit;
+begin
+  Inc(FilenameIdx);
+  tab := pagesEditor.AddTabSheet;
+  with tab do begin
+    Caption := 'Empty';
+  end;
+  Editor := TSynEdit.Create(tab);
+  with Editor do begin
+    Align := alClient;
+    Lines.Clear;
+    Font.Name:= 'Courier New';
+    Parent := tab;
+    Name := 'Editor';
+    Tag := FilenameIdx;
+    Highlighter := hlt;
+  end;
+  pagesEditor.ActivePage := tab;
+  ActiveEditor.SetFocus;
+end;
+
+end.

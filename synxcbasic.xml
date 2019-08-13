@@ -1,0 +1,28 @@
+<Language name="XC=BASIC">
+    <String Start="&quot;" End="&quot;" > </String>
+    <Comment Start="rem" > </Comment>
+    <Keyword>
+        abs asm atn
+        cast call charat const cos curpos 
+        data dec deek dim doke
+        else end endproc endwhile
+        ferr for 
+        gosub goto
+        if inc incbin include inkey input
+        let load lshift 
+        memcpy memset memshift
+        next  
+        on origin
+        peek poke pragma print proc 
+        repeat return rnd rshift
+        save sgn sin sqr strcmp strcpy strlen strncpy strpos sys
+        tan textat then
+        until usr 
+        val 
+        wait watch while 
+    </Keyword>
+    <Token CharsStart="$" Content="0123456789ABCDEFabcdef," Attribute="NUMBER"> </Token>
+    <Token CharsStart="0..9" Content="0..9," Attribute="NUMBER"> </Token>
+    <Attribute Name="Keyword" ForeCol="#000000" Bold="True"></Attribute>
+    <Attribute Name="Number" ForeCol="#4040A0" Italic="True"></Attribute>
+</Language>

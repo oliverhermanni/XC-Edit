@@ -26,31 +26,28 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="8">
+    <RequiredPackages Count="7">
       <Item1>
-        <PackageName Value="attabs_package"/>
+        <PackageName Value="synfacilsyn"/>
       </Item1>
       <Item2>
-        <PackageName Value="atflatcontrols_package"/>
+        <PackageName Value="richmemopackage"/>
       </Item2>
       <Item3>
-        <PackageName Value="LazControls"/>
+        <PackageName Value="JvCtrlsLazR"/>
       </Item3>
       <Item4>
-        <PackageName Value="rxnew"/>
+        <PackageName Value="LazControls"/>
       </Item4>
       <Item5>
         <PackageName Value="JvPageCompsR"/>
       </Item5>
       <Item6>
-        <PackageName Value="CEF4Delphi_Lazarus"/>
+        <PackageName Value="SynEdit"/>
       </Item6>
       <Item7>
-        <PackageName Value="SynEdit"/>
-      </Item7>
-      <Item8>
         <PackageName Value="LCL"/>
-      </Item8>
+      </Item7>
     </RequiredPackages>
     <Units Count="3">
       <Unit0>
