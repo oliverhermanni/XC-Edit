@@ -6,8 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
-  ComCtrls, ExtCtrls, StdCtrls, SynEdit, INIFiles, Process, LazFileUtils,
-  SynHighlighterXML, options, JvRollOut, RichMemo, SynFacilHighlighter, SynEditTypes;
+  ComCtrls, ExtCtrls, StdCtrls, CheckLst, Buttons, SynEdit, INIFiles, Process,
+  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo,
+  SynFacilHighlighter, SynEditTypes;
 
 type
 
@@ -16,6 +17,11 @@ type
   TFormMain = class(TForm)
     ImageList: TImageList;
     ImageListBookmark: TImageList;
+    N5: TMenuItem;
+    MenuProjectUseTestCompiler: TMenuItem;
+    MenuProjectCompileAndRun: TMenuItem;
+    PageControl1: TPageControl;
+    Panel1: TPanel;
     richOutput: TRichMemo;
     RolloutOutput: TJvRollOut;
     MainMenu: TMainMenu;
@@ -35,22 +41,25 @@ type
     MenuEditReplace: TMenuItem;
     MenuEditOptions: TMenuItem;
     MenuFileClose: TMenuItem;
-    MenuProjectRun: TMenuItem;
+    MenuProjectCompile: TMenuItem;
     MenuProject: TMenuItem;
     N4: TMenuItem;
     N3: TMenuItem;
     N2: TMenuItem;
     N1: TMenuItem;
     OpenDialog: TOpenDialog;
-    PageControl1: TPageControl;
     PageControl2: TPageControl;
     pagesEditor: TPageControl;
     SaveDialog: TSaveDialog;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     StatusBar: TStatusBar;
     TabOutput: TTabSheet;
     tabErrorWarnings: TTabSheet;
+    tabProject: TTabSheet;
     ToolBar: TToolBar;
     tbNew: TToolButton;
     tbOpen: TToolButton;
@@ -65,8 +74,11 @@ type
     tbCut: TToolButton;
     tbFind: TToolButton;
     tbReplace: TToolButton;
+    ToolButton4: TToolButton;
+    tbUseTestCompiler: TToolButton;
     ToolButton6: TToolButton;
     tbRun: TToolButton;
+    TreeView1: TTreeView;
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -81,7 +93,9 @@ type
     procedure MenuFileOpenClick(Sender: TObject);
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
-    procedure MenuProjectRunClick(Sender: TObject);
+    procedure MenuProjectCompileAndRunClick(Sender: TObject);
+    procedure MenuProjectCompileClick(Sender: TObject);
+    procedure MenuProjectUseTestCompilerClick(Sender: TObject);
     procedure pagesEditorChange(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
@@ -93,6 +107,9 @@ type
     procedure ReadIniFile;
     procedure SaveIniFile;
     procedure CreateNewTab;
+    procedure CompileCurrentFile;
+    procedure RunInEmulator;
+    procedure WriteToOutputField(txt: string);
   end;
 
 var
@@ -134,31 +151,31 @@ begin
   SaveEditor(false);
 end;
 
-procedure TFormMain.MenuProjectRunClick(Sender: TObject);
-var Run: TProcess;
-    Ini : TIniFile;
-    AStringList : TStringList;
-    Compiler, SourceToCompile, DestFilename: String;
+procedure TFormMain.MenuProjectCompileAndRunClick(Sender: TObject);
 begin
-  AStringList := TStringList.Create;
-  Ini := TIniFile.Create(GetAppConfigFile(false));
-  Compiler := Ini.ReadString('XCBASIC', 'MainCompiler','');
-//  Compiler := 'C:\Windows\System32\calc.exe';
-  SourceToCompile := StrFilenames[ActiveEditor.Tag];
-  DestFilename := ExtractFileNameWithoutExt(SourceToCompile) + '.prg';
-  richOutput.Lines.Add('*** Compile process started ***');
-  Run := TProcess.Create(nil);
-  Run.CurrentDirectory:= ExtractFilePath(Compiler);
-  Run.Executable := Compiler;
-  Run.Parameters.Add(SourceToCompile);
-  Run.Parameters.Add(DestFilename);
-  Run.Options := Run.Options + [poWaitOnExit, poUsePipes];
-  Run.Execute;
-  AStringList.LoadFromStream(Run.Output);
-  richOutput.Lines.AddStrings(AStringList);
-  AStringList.LoadFromStream(Run.Stderr);
-  richOutput.Lines.AddStrings(AStringList);
-  Run.Free;
+  CompileCurrentFile;
+  RunInEmulator;
+end;
+
+procedure TFormMain.MenuProjectCompileClick(Sender: TObject);
+begin
+  CompileCurrentFile;
+end;
+
+procedure TFormMain.MenuProjectUseTestCompilerClick(Sender: TObject);
+begin
+  MenuProjectUseTestCompiler.Checked := not MenuProjectUseTestCompiler.Checked;
+  tbUseTestCompiler.Down := MenuProjectUseTestCompiler.Checked;
+  with richOutput do
+  begin
+    if MenuProjectUseTestCompiler.Checked then begin
+        WriteToOutputField('SWITCHED TO TEST COMPILER!');
+        WriteToOutputField('');
+    end else begin
+      WriteToOutputField('SWITCHED TO MAIN COMPILER!');
+      WriteToOutputField('');
+    end;
+  end;
 end;
 
 procedure TFormMain.pagesEditorChange(Sender: TObject);
@@ -181,6 +198,7 @@ begin
   tbUndo.Enabled := ActiveEditor.CanUndo;
   tbRedo.Enabled := ActiveEditor.CanRedo;
 end;
+
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 var SaveDoc: LongInt;
@@ -339,6 +357,77 @@ begin
   end;
   pagesEditor.ActivePage := tab;
   ActiveEditor.SetFocus;
+end;
+
+procedure TFormMain.CompileCurrentFile;
+var Run: TProcess;
+    Ini : TIniFile;
+    AStringList : TStringList;
+    Compiler, SourceToCompile, DestFilename: String;
+begin
+  AStringList := TStringList.Create;
+  Ini := TIniFile.Create(GetAppConfigFile(false));
+  if MenuProjectUseTestCompiler.Checked then
+    Compiler := Ini.ReadString('XCBASIC', 'TestCompiler','')
+  else
+    Compiler := Ini.ReadString('XCBASIC', 'MainCompiler','');
+  If Compiler = '' then
+  begin
+    WriteToOutputField('Please select at least one compiler in the options dialog!');
+    exit;
+  end;
+  SourceToCompile := StrFilenames[ActiveEditor.Tag];
+  DestFilename := ExtractFileNameWithoutExt(SourceToCompile) + '.prg';
+  WriteToOutputField('*** Compile process started ***');
+  Run := TProcess.Create(nil);
+  with Run do begin
+    CurrentDirectory:= ExtractFilePath(Compiler);
+    Executable := Compiler;
+    Parameters.Add(SourceToCompile);
+    Parameters.Add(DestFilename);
+    Options := Run.Options + [poWaitOnExit, poUsePipes];
+    Execute;
+  end;
+  AStringList.LoadFromStream(Run.Output);
+  WriteToOutputField(AStringList.Text);
+  AStringList.LoadFromStream(Run.Stderr);
+  WriteToOutputField(AStringList.Text);
+  Ini.Free;
+  Run.Free;
+end;
+
+procedure TFormMain.RunInEmulator;
+var Run: TProcess;
+    Ini : TIniFile;
+    AStringList : TStringList;
+    Emulator, DestFilename: String;
+begin
+  Ini := TIniFile.Create(GetAppConfigFile(false));
+  AStringList := TStringList.Create;
+  Emulator := Ini.ReadString('Emulator', 'Location','');
+  If Emulator = '' then
+  begin
+    WriteToOutputField('Please setup Emulator first!');
+    exit;
+  end;
+  DestFilename := ExtractFileNameWithoutExt(StrFilenames[ActiveEditor.Tag]) + '.prg';
+
+  WriteToOutputField('Booting emulator...');
+  Run := TProcess.Create(nil);
+  with Run do begin
+    CurrentDirectory:= ExtractFilePath(DestFilename);
+    Executable := Emulator;
+    Parameters.Add(DestFilename);
+    Options := Run.Options + [poWaitOnExit, poUsePipes];
+    Execute;
+  end;
+  Ini.Free;
+  Run.Free;
+end;
+
+procedure TFormMain.WriteToOutputField(txt: string);
+begin
+  richOutput.Lines.Add(txt);
 end;
 
 end.
