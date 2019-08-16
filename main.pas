@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, SynEdit, INIFiles, Process, LazFileUtils,
-  SynHighlighterXML, options, JvRollOut, RichMemo, SynFacilHighlighter;
+  SynHighlighterXML, options, JvRollOut, RichMemo, SynFacilHighlighter, SynEditTypes;
 
 type
 
@@ -34,7 +34,7 @@ type
     MenuEditFind: TMenuItem;
     MenuEditReplace: TMenuItem;
     MenuEditOptions: TMenuItem;
-    MenuEditClose: TMenuItem;
+    MenuFileClose: TMenuItem;
     MenuProjectRun: TMenuItem;
     MenuProject: TMenuItem;
     N4: TMenuItem;
@@ -70,20 +70,20 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MenuEditCutDrawItem(Sender: TObject; ACanvas: TCanvas;
-      ARect: TRect; AState: TOwnerDrawState);
+    procedure MenuFileCloseClick(Sender: TObject);
+    procedure MenuEditCopyClick(Sender: TObject);
+    procedure MenuEditCutClick(Sender: TObject);
     procedure MenuEditOptionsClick(Sender: TObject);
+    procedure MenuEditPasteClick(Sender: TObject);
     procedure MenuEditRedoClick(Sender: TObject);
     procedure MenuEditUndoClick(Sender: TObject);
     procedure MenuFileNewClick(Sender: TObject);
     procedure MenuFileOpenClick(Sender: TObject);
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
-    procedure MenuProjectClick(Sender: TObject);
     procedure MenuProjectRunClick(Sender: TObject);
     procedure pagesEditorChange(Sender: TObject);
-    procedure tabsEditorTabClick(Sender: TObject);
-    procedure tbRunClick(Sender: TObject);
+    procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
   public
     FilenameIdx: Longint;
@@ -115,7 +115,7 @@ var Filename: string;
 begin
   if OpenDialog.Execute then
   begin
-    if ActiveEditor.Modified then CreateNewTab;
+    if ActiveEditor.Text.Length > 0 then CreateNewTab;
     Filename := OpenDialog.Filename;
     ActiveEditor.Lines.LoadFromFile(Filename);
     pagesEditor.ActivePage.Caption := ExtractFileName(Filename);
@@ -132,11 +132,6 @@ end;
 procedure TFormMain.MenuFileSaveClick(Sender: TObject);
 begin
   SaveEditor(false);
-end;
-
-procedure TFormMain.MenuProjectClick(Sender: TObject);
-begin
-
 end;
 
 procedure TFormMain.MenuProjectRunClick(Sender: TObject);
@@ -171,14 +166,20 @@ begin
   StatusBar.Panels[0].Text:= StrFilenames[ActiveEditor.Tag];
 end;
 
-procedure TFormMain.tabsEditorTabClick(Sender: TObject);
+procedure TFormMain.SynEdit1StatusChange(Sender: TObject;
+  Changes: TSynStatusChanges);
 begin
+  MenuEditCut.Enabled:= ActiveEditor.SelAvail;
+  MenuEditCopy.Enabled := ActiveEditor.SelAvail;
+  MenuEditPaste.Enabled := ActiveEditor.CanPaste;
+  MenuEditUndo.Enabled := ActiveEditor.CanUndo;
+  MenuEditRedo.Enabled := ActiveEditor.CanRedo;
 
-end;
-
-procedure TFormMain.tbRunClick(Sender: TObject);
-begin
-
+  tbCut.Enabled := ActiveEditor.SelAvail;
+  tbCopy.Enabled := ActiveEditor.SelAvail;
+  tbPaste.Enabled := ActiveEditor.CanPaste;
+  tbUndo.Enabled := ActiveEditor.CanUndo;
+  tbRedo.Enabled := ActiveEditor.CanRedo;
 end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -212,10 +213,36 @@ begin
   CreateNewTab;
 end;
 
-procedure TFormMain.MenuEditCutDrawItem(Sender: TObject; ACanvas: TCanvas;
-  ARect: TRect; AState: TOwnerDrawState);
+procedure TFormMain.MenuFileCloseClick(Sender: TObject);
+var tab: TTabSheet;
+    CanClose: Boolean;
+    CloseTab: LongInt;
 begin
-  MenuEditCut.Enabled:= ActiveEditor.SelAvail;
+  tab := pagesEditor.ActivePage;
+  CanClose := true;
+  if Assigned(tab) and (pagesEditor.Pagecount > 1) then begin
+    if ActiveEditor.Modified then begin
+      CloseTab := Application.MessageBox('Do you want to save your latest changes?', 'Editor modified',  MB_ICONQUESTION + MB_YESNO);
+      case CloseTab of
+        ID_YES:
+          CanClose := false;
+        ID_NO:
+            CanClose := true;
+      end;
+
+    end;
+    if CanClose then tab.Free;
+  end;
+end;
+
+procedure TFormMain.MenuEditCopyClick(Sender: TObject);
+begin
+  ActiveEditor.CopyToClipboard;
+end;
+
+procedure TFormMain.MenuEditCutClick(Sender: TObject);
+begin
+  ActiveEditor.CutToClipboard;
 end;
 
 procedure TFormMain.MenuEditOptionsClick(Sender: TObject);
@@ -223,14 +250,19 @@ begin
   FormOptions.Show;
 end;
 
+procedure TFormMain.MenuEditPasteClick(Sender: TObject);
+begin
+  ActiveEditor.PasteFromClipboard;
+end;
+
 procedure TFormMain.MenuEditRedoClick(Sender: TObject);
 begin
-//  ActiveEditor.Redo
+  ActiveEditor.Redo
 end;
 
 procedure TFormMain.MenuEditUndoClick(Sender: TObject);
 begin
-// ActiveEditor.Undo
+ ActiveEditor.Undo
 end;
 
 function TFormMain.SaveEditor(WithDialog: boolean): boolean;
@@ -264,7 +296,6 @@ begin
     else
       WindowState := wsNormal;
   end;
-
   Ini.Free;
 end;
 
@@ -297,13 +328,14 @@ begin
   end;
   Editor := TSynEdit.Create(tab);
   with Editor do begin
+    Name := 'Editor';
     Align := alClient;
     Lines.Clear;
     Font.Name:= 'Courier New';
     Parent := tab;
-    Name := 'Editor';
     Tag := FilenameIdx;
     Highlighter := hlt;
+    Editor.OnStatusChange := @SynEdit1StatusChange;
   end;
   pagesEditor.ActivePage := tab;
   ActiveEditor.SetFocus;

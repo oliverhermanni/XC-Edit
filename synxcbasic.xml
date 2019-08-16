@@ -1,4 +1,13 @@
 <Language name="XC=BASIC">
+  <Completion>
+    "for expression&#xD;  &#xD;next"
+    "if expression then"
+    "if expression then &#xD;  &#xD;else expression&#xD;"
+    "proc&#xD;  &#xD;endproc"
+    "repeat&#xD;  &#xD;until"
+    "while&#xD;  &#xD;endwhile"
+    <Include Attribute="Keyword"></Include>
+    </Completion>
     <String Start="&quot;" End="&quot;" > </String>
     <Comment Start="rem" > </Comment>
     <Keyword>

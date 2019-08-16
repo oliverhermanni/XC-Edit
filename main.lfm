@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 548
+  Left = 469
   Height = 609
-  Top = 279
+  Top = 241
   Width = 800
   Caption = 'XC=Edit'
   ClientHeight = 589
@@ -234,10 +234,11 @@ object FormMain: TFormMain
         ShortCut = 16462
         OnClick = MenuFileNewClick
       end
-      object MenuEditClose: TMenuItem
+      object MenuFileClose: TMenuItem
         Caption = '&Close'
         ImageIndex = 1
         ShortCut = 16471
+        OnClick = MenuFileCloseClick
       end
       object MenuFileOpen: TMenuItem
         Caption = '&Open...'
@@ -284,17 +285,18 @@ object FormMain: TFormMain
         Caption = 'C&ut'
         ImageIndex = 8
         ShortCut = 16472
-        OnDrawItem = MenuEditCutDrawItem
       end
       object MenuEditCopy: TMenuItem
         Caption = '&Copy'
         ImageIndex = 9
         ShortCut = 16451
+        OnClick = MenuEditCopyClick
       end
       object MenuEditPaste: TMenuItem
         Caption = '&Paste'
         ImageIndex = 10
         ShortCut = 16470
+        OnClick = MenuEditPasteClick
       end
       object N3: TMenuItem
         Caption = '-'
@@ -320,7 +322,6 @@ object FormMain: TFormMain
     end
     object MenuProject: TMenuItem
       Caption = '&Project'
-      OnClick = MenuProjectClick
       object MenuProjectRun: TMenuItem
         Caption = '&Run'
         ImageIndex = 14
