@@ -1,0 +1,73 @@
+object FormAbout: TFormAbout
+  Left = 705
+  Height = 346
+  Top = 337
+  Width = 321
+  BorderStyle = bsDialog
+  Caption = 'About'
+  ClientHeight = 346
+  ClientWidth = 321
+  FormStyle = fsStayOnTop
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '2.0.4.0'
+  object Button1: TButton
+    Left = 127
+    Height = 25
+    Top = 312
+    Width = 75
+    Caption = '&OK'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 73
+    Height = 65
+    Top = 8
+    Width = 183
+    Alignment = taCenter
+    Caption = 'XC=Edit'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -48
+    Font.Name = 'Segoe UI'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object LabelVersion: TLabel
+    Left = 190
+    Height = 15
+    Top = 64
+    Width = 66
+    Alignment = taRightJustify
+    Caption = 'LabelVersion'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 72
+    Height = 15
+    Top = 288
+    Width = 184
+    Caption = 'Copyright © 2019 Oliver Hermanni'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 92
+    Height = 15
+    Top = 96
+    Width = 145
+    Caption = 'Written by Oliver Hermanni'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 16
+    Height = 15
+    Top = 128
+    Width = 85
+    Caption = 'Many thanks to '
+    ParentColor = False
+  end
+end

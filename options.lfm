@@ -11,19 +11,20 @@ object FormOptions: TFormOptions
   FormStyle = fsStayOnTop
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '2.0.2.0'
+  LCLVersion = '2.0.4.0'
   object Panel1: TPanel
     Left = 0
     Height = 45
     Top = 376
     Width = 581
     Align = alBottom
+    BevelOuter = bvNone
     BorderStyle = bsSingle
     ClientHeight = 41
     ClientWidth = 577
     TabOrder = 0
     object ButtonOk: TButton
-      Left = 408
+      Left = 488
       Height = 25
       Top = 8
       Width = 75
@@ -32,7 +33,7 @@ object FormOptions: TFormOptions
       TabOrder = 0
     end
     object ButtonCancel: TButton
-      Left = 496
+      Left = 9
       Height = 25
       Top = 8
       Width = 75

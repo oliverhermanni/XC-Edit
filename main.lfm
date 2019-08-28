@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 423
+  Left = 434
   Height = 609
-  Top = 261
+  Top = 258
   Width = 800
   Caption = 'XC=Edit'
   ClientHeight = 589
@@ -34,15 +34,13 @@ object FormMain: TFormMain
     TabOrder = 1
     object tbNew: TToolButton
       Left = 1
-      Hint = 'New file'
       Top = 2
-      Caption = '&New'
+      Caption = '&New file'
       ImageIndex = 0
-      MenuItem = MenuFileNew
+      MenuItem = MenuFileNewFile
     end
     object tbOpen: TToolButton
       Left = 24
-      Hint = 'Open'
       Top = 2
       Caption = '&Open...'
       ImageIndex = 2
@@ -51,7 +49,6 @@ object FormMain: TFormMain
     end
     object tbSave: TToolButton
       Left = 47
-      Hint = 'Save current file'
       Top = 2
       Caption = '&Save'
       ImageIndex = 3
@@ -67,7 +64,6 @@ object FormMain: TFormMain
     end
     object tbUndo: TToolButton
       Left = 78
-      Hint = 'Undo'
       Top = 2
       Caption = '&Undo'
       ImageIndex = 6
@@ -77,7 +73,6 @@ object FormMain: TFormMain
     end
     object tbRedo: TToolButton
       Left = 101
-      Hint = 'Redo'
       Top = 2
       Caption = '&Redo'
       ImageIndex = 7
@@ -93,7 +88,6 @@ object FormMain: TFormMain
     end
     object tbCut: TToolButton
       Left = 132
-      Hint = 'Cut'
       Top = 2
       Caption = 'C&ut'
       ImageIndex = 8
@@ -101,7 +95,6 @@ object FormMain: TFormMain
     end
     object tbCopy: TToolButton
       Left = 155
-      Hint = 'Copy'
       Top = 2
       Caption = '&Copy'
       ImageIndex = 9
@@ -109,7 +102,6 @@ object FormMain: TFormMain
     end
     object tbPaste: TToolButton
       Left = 178
-      Hint = 'Paste'
       Top = 2
       Caption = '&Paste'
       ImageIndex = 10
@@ -124,7 +116,6 @@ object FormMain: TFormMain
     end
     object tbFind: TToolButton
       Left = 209
-      Hint = 'Search...'
       Top = 2
       Caption = '&Find...'
       ImageIndex = 11
@@ -132,7 +123,6 @@ object FormMain: TFormMain
     end
     object tbReplace: TToolButton
       Left = 232
-      Hint = 'Search & Replace'
       Top = 2
       Caption = 'R&eplace...'
       ImageIndex = 12
@@ -145,17 +135,15 @@ object FormMain: TFormMain
       Caption = 'ToolButton6'
       Style = tbsSeparator
     end
-    object tbRun: TToolButton
+    object tbCompile: TToolButton
       Left = 263
-      Hint = 'Compile'
       Top = 2
-      Caption = '&Run'
+      Caption = '&Compile'
       ImageIndex = 15
       MenuItem = MenuProjectCompile
     end
-    object ToolButton4: TToolButton
+    object tbCompileAndRun: TToolButton
       Left = 286
-      Hint = 'Compile & Run in emulator'
       Top = 2
       Caption = 'Compile && &Run'
       ImageIndex = 14
@@ -176,6 +164,7 @@ object FormMain: TFormMain
     Height = 358
     Top = 24
     Width = 5
+    Visible = False
   end
   object RolloutOutput: TJvRollOut
     Left = 0
@@ -186,6 +175,7 @@ object FormMain: TFormMain
     ButtonFont.Color = clWindowText
     ButtonFont.Style = [fsBold]
     Caption = 'Output'
+    Colors.ButtonColor = clHighlight
     Colors.Color = clNone
     TabOrder = 3
     FAWidth = 145
@@ -213,14 +203,12 @@ object FormMain: TFormMain
           Width = 790
           Align = alClient
           HideSelection = False
+          PopupMenu = popupOutput
           ReadOnly = True
           ScrollBars = ssAutoBoth
           TabOrder = 0
           ZoomFactor = 1
         end
-      end
-      object tabErrorWarnings: TTabSheet
-        Caption = 'Errors / Warnings'
       end
     end
   end
@@ -241,6 +229,7 @@ object FormMain: TFormMain
     Align = alClient
     TabOrder = 5
     OnChange = pagesEditorChange
+    OnMouseDown = pagesEditorMouseDown
   end
   object PageControl1: TPageControl
     Left = 0
@@ -252,6 +241,7 @@ object FormMain: TFormMain
     TabIndex = 0
     TabOrder = 6
     TabPosition = tpLeft
+    Visible = False
     object tabProject: TTabSheet
       Caption = 'Project'
       ClientHeight = 350
@@ -310,11 +300,17 @@ object FormMain: TFormMain
     top = 40
     object MenuFile: TMenuItem
       Caption = '&File'
-      object MenuFileNew: TMenuItem
-        Caption = '&New'
+      OnClick = MenuFileClick
+      object MenuFileNewFile: TMenuItem
+        Caption = '&New file'
         ImageIndex = 0
         ShortCut = 16462
-        OnClick = MenuFileNewClick
+        OnClick = MenuFileNewFileClick
+      end
+      object MenuFileNewProject: TMenuItem
+        Caption = 'New p&roject...'
+        Visible = False
+        OnClick = MenuFileNewProjectClick
       end
       object MenuFileClose: TMenuItem
         Caption = '&Close'
@@ -367,6 +363,7 @@ object FormMain: TFormMain
         Caption = 'C&ut'
         ImageIndex = 8
         ShortCut = 16472
+        OnClick = MenuEditCutClick
       end
       object MenuEditCopy: TMenuItem
         Caption = '&Copy'
@@ -387,6 +384,7 @@ object FormMain: TFormMain
         Caption = '&Find...'
         ImageIndex = 11
         ShortCut = 16454
+        OnClick = MenuEditFindClick
       end
       object MenuEditReplace: TMenuItem
         Caption = 'R&eplace...'
@@ -423,6 +421,19 @@ object FormMain: TFormMain
         Caption = 'Use &test compiler'
         ImageIndex = 16
         OnClick = MenuProjectUseTestCompilerClick
+      end
+    end
+    object MenuHelp: TMenuItem
+      Caption = '&Help'
+      object MenuItem1: TMenuItem
+        Caption = '&XC-BASIC Online help'
+      end
+      object N7: TMenuItem
+        Caption = '-'
+      end
+      object MenuHelpAbout: TMenuItem
+        Caption = '&About...'
+        OnClick = MenuHelpAboutClick
       end
     end
   end
@@ -1219,5 +1230,27 @@ object FormMain: TFormMain
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001D5887961D5887FF1D5887961D58
       870FFFFFFF00FFFFFF00FFFFFF00
     }
+  end
+  object popupOutput: TPopupMenu
+    left = 440
+    top = 472
+    object popupOutputClear: TMenuItem
+      Caption = '&Clear'
+      OnClick = popupOutputClearClick
+    end
+    object N6: TMenuItem
+      Caption = '-'
+    end
+    object popupOutputSaveToFile: TMenuItem
+      Caption = '&Save to file...'
+      OnClick = popupOutputSaveToFileClick
+    end
+  end
+  object FindDialog: TFindDialog
+    Title = 'Find'
+    Options = [frDown, frFindNext]
+    OnFind = FindDialogFind
+    left = 454
+    top = 144
   end
 end
