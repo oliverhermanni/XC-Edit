@@ -65,9 +65,29 @@ object FormAbout: TFormAbout
   object Label4: TLabel
     Left = 16
     Height = 15
-    Top = 128
-    Width = 85
-    Caption = 'Many thanks to '
+    Top = 120
+    Width = 209
+    Caption = 'Many thanks to Csaba Fekete, author of'
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 232
+    Height = 15
+    Top = 120
+    Width = 55
+    Caption = 'XC=BASIC'
+    Font.Color = clHighlight
+    Font.Style = [fsUnderline]
+    ParentColor = False
+    ParentFont = False
+    OnClick = Label5Click
+  end
+  object Label6: TLabel
+    Left = 16
+    Height = 15
+    Top = 136
+    Width = 253
+    Caption = 'Without him this program wouldn''t be possible!'
     ParentColor = False
   end
 end

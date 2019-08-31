@@ -5,7 +5,7 @@ unit about;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, fileinfo;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, fileinfo, LCLIntf;
 
 type
 
@@ -17,9 +17,12 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
     LabelVersion: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label5Click(Sender: TObject);
   private
 
   public
@@ -47,6 +50,11 @@ begin
   FileVerInfo:=TFileVersionInfo.Create(nil);
   FileVerInfo.ReadFileInfo;
   LabelVersion.Caption := FileVerInfo.VersionStrings.Values['FileVersion'];
+end;
+
+procedure TFormAbout.Label5Click(Sender: TObject);
+begin
+  OpenURL('https://xc-basic.net/doku.php');
 end;
 
 end.

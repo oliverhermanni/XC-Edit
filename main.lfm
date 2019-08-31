@@ -420,6 +420,7 @@ object FormMain: TFormMain
       object MenuProjectUseTestCompiler: TMenuItem
         Caption = 'Use &test compiler'
         ImageIndex = 16
+        ShortCut = 16500
         OnClick = MenuProjectUseTestCompilerClick
       end
     end
@@ -427,6 +428,7 @@ object FormMain: TFormMain
       Caption = '&Help'
       object MenuItem1: TMenuItem
         Caption = '&XC-BASIC Online help'
+        OnClick = MenuItem1Click
       end
       object N7: TMenuItem
         Caption = '-'

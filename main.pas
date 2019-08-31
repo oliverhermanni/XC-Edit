@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process,
   LazFileUtils, SynHighlighterXML, options, JvRollOut, JvGroupHeader, RichMemo,
-  SynFacilHighlighter, SynEditTypes, newproject, about;
+  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf;
 
 type
 
@@ -107,6 +107,7 @@ type
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
     procedure MenuHelpAboutClick(Sender: TObject);
+    procedure MenuItem1Click(Sender: TObject);
     procedure MenuProjectCompileAndRunClick(Sender: TObject);
     procedure MenuProjectCompileClick(Sender: TObject);
     procedure MenuProjectUseTestCompilerClick(Sender: TObject);
@@ -174,6 +175,11 @@ end;
 procedure TFormMain.MenuHelpAboutClick(Sender: TObject);
 begin
   FormAbout.Show;
+end;
+
+procedure TFormMain.MenuItem1Click(Sender: TObject);
+begin
+    OpenURL('https://xc-basic.net/doku.php');
 end;
 
 procedure TFormMain.MenuProjectCompileAndRunClick(Sender: TObject);
