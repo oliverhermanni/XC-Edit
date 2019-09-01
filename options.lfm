@@ -9,6 +9,7 @@ object FormOptions: TFormOptions
   ClientHeight = 421
   ClientWidth = 581
   FormStyle = fsStayOnTop
+  OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '2.0.4.0'
@@ -47,9 +48,9 @@ object FormOptions: TFormOptions
     Height = 376
     Top = 0
     Width = 355
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alClient
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'XC=BASIC'
@@ -92,7 +93,7 @@ object FormOptions: TFormOptions
           Left = 8
           Height = 15
           Top = 80
-          Width = 71
+          Width = 70
           Caption = 'Test compiler'
           ParentColor = False
         end
@@ -124,7 +125,7 @@ object FormOptions: TFormOptions
           Left = 8
           Height = 15
           Top = 48
-          Width = 166
+          Width = 167
           Caption = 'Location of the xcb batch script'
           ParentColor = False
         end
@@ -184,6 +185,61 @@ object FormOptions: TFormOptions
         end
       end
     end
+    object TabSheet3: TTabSheet
+      Caption = 'Editor'
+      ClientHeight = 348
+      ClientWidth = 347
+      object GroupBox3: TGroupBox
+        Left = 8
+        Height = 329
+        Top = 8
+        Width = 329
+        Caption = 'Editor Settings'
+        ClientHeight = 309
+        ClientWidth = 325
+        TabOrder = 0
+        object EditFont: TEdit
+          Left = 8
+          Height = 23
+          Top = 24
+          Width = 288
+          ReadOnly = True
+          TabOrder = 0
+        end
+        object btnEditFontSettings: TSpeedButton
+          Left = 296
+          Height = 22
+          Top = 24
+          Width = 23
+          Images = FormMain.ImageList
+          ImageIndex = 17
+          OnClick = btnEditFontSettingsClick
+        end
+        object Label7: TLabel
+          Left = 8
+          Height = 15
+          Top = 7
+          Width = 71
+          Caption = 'Font settings:'
+          ParentColor = False
+        end
+        object editTabWidth: TSpinEdit
+          Left = 71
+          Height = 23
+          Top = 56
+          Width = 65
+          TabOrder = 1
+        end
+        object Label8: TLabel
+          Left = 8
+          Height = 15
+          Top = 60
+          Width = 54
+          Caption = 'Tab width:'
+          ParentColor = False
+        end
+      end
+    end
   end
   object Panel2: TPanel
     Left = 0
@@ -206,5 +262,12 @@ object FormOptions: TFormOptions
       OnClick = ListBoxTabsClick
       TabOrder = 0
     end
+  end
+  object FontDialog1: TFontDialog
+    MinFontSize = 0
+    MaxFontSize = 0
+    Options = [fdEffects, fdFixedPitchOnly, fdNoSimulations, fdNoStyleSel, fdNoVectorFonts]
+    left = 16
+    top = 16
   end
 end

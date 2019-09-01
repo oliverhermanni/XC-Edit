@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process,
   LazFileUtils, SynHighlighterXML, options, JvRollOut, JvGroupHeader, RichMemo,
-  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf;
+  SynFacilHighlighter, SynEditTypes, SynEdit, newproject, about, LCLIntf;
 
 type
 
@@ -331,6 +331,7 @@ end;
 
 procedure TFormMain.MenuEditOptionsClick(Sender: TObject);
 begin
+  FormOptions.ActiveEditor := ActiveEditor;
   FormOptions.Show;
 end;
 
