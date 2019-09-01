@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process,
-  LazFileUtils, SynHighlighterXML, options, JvRollOut, JvGroupHeader, RichMemo,
-  SynFacilHighlighter, SynEditTypes, SynEdit, newproject, about, LCLIntf;
+  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo,
+  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf;
 
 type
 
@@ -32,6 +32,7 @@ type
     PageControl1: TPageControl;
     Panel1: TPanel;
     popupOutput: TPopupMenu;
+    ReplaceDialog: TReplaceDialog;
     richOutput: TRichMemo;
     RolloutOutput: TJvRollOut;
     MainMenu: TMainMenu;
@@ -93,6 +94,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MenuEditFindClick(Sender: TObject);
+    procedure MenuEditReplaceClick(Sender: TObject);
     procedure MenuFileClick(Sender: TObject);
     procedure MenuFileCloseClick(Sender: TObject);
     procedure MenuEditCopyClick(Sender: TObject);
@@ -116,6 +118,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure popupOutputClearClick(Sender: TObject);
     procedure popupOutputSaveToFileClick(Sender: TObject);
+    procedure ReplaceDialogFind(Sender: TObject);
+    procedure ReplaceDialogReplace(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
   public
@@ -235,6 +239,44 @@ begin
   end;
 end;
 
+procedure TFormMain.ReplaceDialogFind(Sender: TObject);
+var
+  SearchOptions: TSynSearchOptions;
+begin
+  with Sender as TReplaceDialog do begin
+    SearchOptions := [];
+    if frMatchCase in Options then
+      Include(SearchOptions, ssoMatchCase);
+    if frWholeWord in Options then
+      Include(SearchOptions, ssoWholeWord);
+    if frDown in Options then
+    else
+      Include(SearchOptions, ssoBackwards);
+    ActiveEditor.SearchReplace(FindText, ReplaceText, SearchOptions);
+  end;
+end;
+
+procedure TFormMain.ReplaceDialogReplace(Sender: TObject);
+var
+  SearchOptions: TSynSearchOptions;
+begin
+  with Sender as TReplaceDialog do begin
+    SearchOptions := [];
+    if frMatchCase in Options then
+      Include(SearchOptions, ssoMatchCase);
+    if frWholeWord in Options then
+      Include(SearchOptions, ssoWholeWord);
+    if frDown in Options then
+    else
+      Include(SearchOptions, ssoBackwards);
+    if frReplace in Options then
+      Include(SearchOptions, ssoReplace);
+    if frReplaceAll in Options then
+      Include(SearchOptions, ssoReplaceAll);
+    ActiveEditor.SearchReplace(FindText, ReplaceText, SearchOptions);
+  end;
+end;
+
 procedure TFormMain.SynEdit1StatusChange(Sender: TObject;
   Changes: TSynStatusChanges);
 var
@@ -280,15 +322,19 @@ begin
 end;
 
 procedure TFormMain.FindDialogFind(Sender: TObject);
-var k: integer;
+var
+  SearchOptions: TSynSearchOptions;
 begin
   with Sender as TFindDialog do begin
-    k := Pos(FindText, ActiveEditor.Lines.Text);
-    if k > 0 then begin
-      ActiveEditor.Selstart := k;
-      ActiveEditor.SelEnd := k + Length(FindText)
-    end else
-      beep();
+    SearchOptions := [];
+    if frMatchCase in Options then
+      Include(SearchOptions, ssoMatchCase);
+    if frWholeWord in Options then
+      Include(SearchOptions, ssoWholeWord);
+    if frDown in Options then
+    else
+      Include(SearchOptions, ssoBackwards);
+    ActiveEditor.SearchReplace(FindText, '', SearchOptions);
   end;
 end;
 
@@ -307,6 +353,11 @@ end;
 procedure TFormMain.MenuEditFindClick(Sender: TObject);
 begin
   FindDialog.Execute;
+end;
+
+procedure TFormMain.MenuEditReplaceClick(Sender: TObject);
+begin
+  ReplaceDialog.Execute
 end;
 
 procedure TFormMain.MenuFileClick(Sender: TObject);

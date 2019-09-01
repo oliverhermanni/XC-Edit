@@ -1,7 +1,7 @@
 object FormOptions: TFormOptions
-  Left = 398
+  Left = 442
   Height = 421
-  Top = 366
+  Top = 388
   Width = 581
   BorderIcons = []
   BorderStyle = bsDialog

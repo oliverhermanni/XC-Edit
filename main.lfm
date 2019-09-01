@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 434
+  Left = 447
   Height = 609
-  Top = 258
+  Top = 225
   Width = 800
   Caption = 'XC=Edit'
   ClientHeight = 589
@@ -390,6 +390,7 @@ object FormMain: TFormMain
         Caption = 'R&eplace...'
         ImageIndex = 12
         ShortCut = 16456
+        OnClick = MenuEditReplaceClick
       end
       object N4: TMenuItem
         Caption = '-'
@@ -1282,9 +1283,16 @@ object FormMain: TFormMain
   end
   object FindDialog: TFindDialog
     Title = 'Find'
-    Options = [frDown, frFindNext]
+    Options = [frDown, frFindNext, frHideEntireScope]
     OnFind = FindDialogFind
-    left = 454
-    top = 144
+    left = 496
+    top = 176
+  end
+  object ReplaceDialog: TReplaceDialog
+    Options = [frDown, frReplace, frReplaceAll, frHidePromptOnReplace]
+    OnFind = FindDialogFind
+    OnReplace = ReplaceDialogReplace
+    left = 496
+    top = 232
   end
 end
