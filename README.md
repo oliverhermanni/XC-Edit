@@ -30,7 +30,7 @@ This is a very early preview of XC=Edit. Future development includes:
 * full project management
 * parsing error and warning messages
 * procedure List
-* find / Search & Replace (it's there, but not working yet)
+* ~~find / Search & Replace (it's there, but not working yet)~~ (should work now)
 * better syntax highlighting
 * open multiple files at once
 * bug fixes
