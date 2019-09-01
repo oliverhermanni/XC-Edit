@@ -1283,7 +1283,7 @@ object FormMain: TFormMain
   end
   object FindDialog: TFindDialog
     Title = 'Find'
-    Options = [frDown, frFindNext, frHideEntireScope]
+    Options = [frDown, frFindNext]
     OnFind = FindDialogFind
     left = 496
     top = 176

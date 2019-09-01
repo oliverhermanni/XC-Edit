@@ -132,6 +132,7 @@ type
     function CompileCurrentFile: boolean;
     procedure RunInEmulator;
     procedure WriteToOutputField(txt: string);
+    var ProcessEmulator: TProcess;
   end;
 
 var
@@ -252,6 +253,8 @@ begin
     if frDown in Options then
     else
       Include(SearchOptions, ssoBackwards);
+    if frEntireScope in Options then
+      Include(SearchOptions, ssoEntireScope);
     ActiveEditor.SearchReplace(FindText, ReplaceText, SearchOptions);
   end;
 end;
@@ -273,6 +276,8 @@ begin
       Include(SearchOptions, ssoReplace);
     if frReplaceAll in Options then
       Include(SearchOptions, ssoReplaceAll);
+    if frEntireScope in Options then
+      Include(SearchOptions, ssoEntireScope);
     ActiveEditor.SearchReplace(FindText, ReplaceText, SearchOptions);
   end;
 end;
@@ -530,9 +535,9 @@ begin
 end;
 
 procedure TFormMain.RunInEmulator;
-var Run: TProcess;
-    Ini : TIniFile;
-    Emulator, DestFilename: String;
+var
+  Ini : TIniFile;
+  Emulator, DestFilename: String;
 begin
   Ini := TIniFile.Create(GetAppConfigFile(false));
   Emulator := Ini.ReadString('Emulator', 'Location','');
@@ -543,17 +548,21 @@ begin
   end;
   DestFilename := ExtractFileNameWithoutExt(ActiveEditor.Filename) + '.prg';
 
-  WriteToOutputField('Booting emulator...');
-  Run := TProcess.Create(nil);
-  with Run do begin
+  if Assigned(ProcessEmulator) then begin
+    ProcessEmulator.Terminate(0);
+    WriteToOutputField('Stopped emulator process...');
+  end;
+  ProcessEmulator := TProcess.Create(nil);
+
+  with ProcessEmulator do begin
     CurrentDirectory:= ExtractFilePath(DestFilename);
     Executable := Emulator;
     Parameters.Add(DestFilename);
-    Options := Run.Options + [poUsePipes];
+    Options := Options + [poUsePipes];
+    WriteToOutputField('Booting emulator...');
     Execute;
   end;
   Ini.Free;
-  Run.Free;
 end;
 
 procedure TFormMain.WriteToOutputField(txt: string);
