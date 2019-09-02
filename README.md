@@ -14,7 +14,7 @@ Currently it's very limited in its usage, as it's in early stage. But XC=Edit is
 ## Getting started
 You need XC=BASIC of course. You can find more infos [here](https://xc-basic.net/).
 
-After launching XC=Edit you need to select the XC=BASIC cross compiler. For this go to `Edit -> Options`. You can choose both the master and development branch (which usually provides more functionality, but probably is less stable) as different compilers. 
+After launching XC=Edit you need to select the XC=BASIC cross compiler. For this go to `Edit -> Options`. You can choose both the master and development branch (which usually provides more functionality, but probably is less stable) as different compilers. Please select xcb.bat.
 
 In the options you also need to choose an emulator to run compiled XC=BASIC programs. XC=BASIC is only tested with VICE.
 
