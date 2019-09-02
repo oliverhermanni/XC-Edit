@@ -48,9 +48,9 @@ object FormOptions: TFormOptions
     Height = 376
     Top = 0
     Width = 355
-    ActivePage = TabSheet3
+    ActivePage = TabSheet2
     Align = alClient
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'XC=BASIC'
@@ -173,7 +173,9 @@ object FormOptions: TFormOptions
           Height = 23
           Top = 88
           Width = 312
+          ReadOnly = True
           TabOrder = 1
+          Visible = False
         end
         object Label6: TLabel
           Left = 8
@@ -182,6 +184,15 @@ object FormOptions: TFormOptions
           Width = 90
           Caption = 'Emulator params'
           ParentColor = False
+          Visible = False
+        end
+        object CheckCloseEmulator: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 136
+          Width = 196
+          Caption = 'Close emulator if already running'
+          TabOrder = 2
         end
       end
     end

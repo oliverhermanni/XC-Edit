@@ -15,6 +15,7 @@ type
   TFormOptions = class(TForm)
     ButtonCancel: TButton;
     ButtonOk: TButton;
+    CheckCloseEmulator: TCheckBox;
     EditFont: TEdit;
     EditEmulatorParams: TEdit;
     fneEmulatorLocation: TFileNameEdit;
@@ -131,6 +132,7 @@ begin
       + ', '
       + IntToStr(Ini.ReadInteger('Editor', 'Font', ActiveEditor.Font.Size)) + 'pt';
     editTabWidth.Value:= Ini.ReadInteger('Editor', 'TabWidth', ActiveEditor.TabWidth);
+    CheckCloseEmulator.Checked:= Ini.ReadBool('Emulator', 'CloseEmulator', true);
   end;
 end;
 
@@ -154,6 +156,7 @@ begin
       WriteInteger('Editor', 'Size', ActiveEditor.Font.Size);
     end;
     WriteInteger('Editor', 'TabWidth', editTabWidth.Value);
+    WriteBool('Emulator', 'CloseEmulator', CheckCloseEmulator.Checked);
   end;
 end;
 

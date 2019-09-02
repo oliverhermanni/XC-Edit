@@ -133,6 +133,7 @@ type
     procedure RunInEmulator;
     procedure WriteToOutputField(txt: string);
     var ProcessEmulator: TProcess;
+    var CloseEmulator: Boolean;
   end;
 
 var
@@ -439,6 +440,7 @@ begin
       Height := Ini.ReadInteger('FORM', 'Height', 480);
     end;
   end;
+  CloseEmulator:= Ini.ReadBool('Emulator', 'CloseEmulator', true);
   Ini.Free;
 end;
 
@@ -548,7 +550,7 @@ begin
   end;
   DestFilename := ExtractFileNameWithoutExt(ActiveEditor.Filename) + '.prg';
 
-  if Assigned(ProcessEmulator) then begin
+  if Assigned(ProcessEmulator) and CloseEmulator then begin
     ProcessEmulator.Terminate(0);
     WriteToOutputField('Stopped emulator process...');
   end;
