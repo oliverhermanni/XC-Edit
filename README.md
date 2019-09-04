@@ -32,7 +32,7 @@ This is a very early preview of XC=Edit. Future development includes:
 * procedure List
 * ~~find / Search & Replace (it's there, but not working yet)~~ (should work now)
 * better syntax highlighting
-* open multiple files at once
+* ~~open multiple files at once~~ (fixed)
 * bug fixes
 * much more
 

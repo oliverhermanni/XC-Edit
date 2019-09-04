@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 435
+  Left = 434
   Height = 609
-  Top = 222
+  Top = 228
   Width = 800
   Caption = 'XC=Edit'
   ClientHeight = 589
@@ -241,7 +241,6 @@ object FormMain: TFormMain
     TabIndex = 0
     TabOrder = 6
     TabPosition = tpLeft
-    Visible = False
     object tabProject: TTabSheet
       Caption = 'Project'
       ClientHeight = 350
@@ -309,7 +308,6 @@ object FormMain: TFormMain
       end
       object MenuFileNewProject: TMenuItem
         Caption = 'New p&roject...'
-        Visible = False
         OnClick = MenuFileNewProjectClick
       end
       object MenuFileClose: TMenuItem

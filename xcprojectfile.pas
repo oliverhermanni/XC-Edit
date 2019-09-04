@@ -5,7 +5,7 @@ unit xcprojectfile;
 interface
 
 uses
-  Classes, Dialogs, SysUtils, fpjson, jsonparser, LazFileUtils;
+  Classes, Dialogs, SysUtils, LazFileUtils, laz2_DOM, laz2_XMLRead, laz2_XMLWrite;
 
 const __VERSION__ = '1.0';
 
@@ -13,40 +13,63 @@ const __VERSION__ = '1.0';
     private
     public
       procedure CreateProject(name, author, comment, folder, executable: string);
+      procedure CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string);
   end;
 
 implementation
 
 procedure TXCProjectFile.CreateProject(name, author, comment, folder, executable: string);
 var
-  jpo: TJSONObject;
-  jfa: TJSONArray;
-  stream: TFileStream;
-  fsz: longint;
+  Doc: TXMLDocument;
+  RootNode, ParentNode, ValueNode, FilesNode, FileValueNode: TDOMNode;
 begin
-  {*
-  jpo := TJSONObject.Create;
-  with jpo do begin
-    Add('version', __VERSION__);
-    Add('name', name);
-    Add('author', author);
-    Add('comment', comment);
-    Add('folder', folder);
-    Add('executable', executable + '.prg');
-    Add('mainsource', executable + '.bas');
-    jfa := TJSONArray.Create;
-    jpo.Add('files', jfa);
-  end;
-  ForceDirectory(folder);
-  stream := TFileStream.Create(folder + DirectorySeparator + name, fmCreate);
   try
-    stream.Position := 0;
-    stream.Write(, fsz);
+    Doc := TXMLDocument.Create;
+    // Create document
+    RootNode := Doc.CreateElement('Project');
+    Doc.AppendChild(RootNode);
+    RootNode:= Doc.DocumentElement;
+    // Version of current project (not required for now)
+    CreateNode(Doc, RootNode, 'Version', __VERSION__);
+    // Name of Project
+    CreateNode(Doc, RootNode, 'Name', name);
+    // author
+    CreateNode(Doc, RootNode, 'Author', author);
+    // comment
+    CreateNode(Doc, RootNode, 'Comment', comment);
+    // folder
+    CreateNode(Doc, RootNode, 'Folder', folder);
+    // executable
+    CreateNode(Doc, RootNode, 'Executable', executable + '.prg');
+
+    // mainsource
+    CreateNode(Doc, RootNode, 'Executable', executable + '.bas');
+
+    ParentNode:= Doc.CreateElement('Files');
+    FilesNode := Doc.CreateElement('File');
+    // filename
+    CreateNode(Doc, FilesNode, 'Filename', executable + '.bas');
+    CreateNode(Doc, FilesNode, 'Folder', folder);
+    CreateNode(Doc, FilesNode, 'IncludeInBuild', '1');
+    CreateNode(Doc, FilesNode, 'FileOpen', '1');
+
+    ParentNode.AppendChild(FilesNode);
+    RootNode.AppendChild(ParentNode);
+
+    writeXMLFile(Doc, folder + DirectorySeparator + name + '.xcprj');
   finally
-    stream.free;
+    Doc.Free;
   end;
-  ShowMessage(folder + DirectorySeparator + name);
-  *}
+end;
+
+procedure TXCProjectFile.CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string);
+var
+  ParentNode, ValueNode: TDOMNode;
+begin
+  ParentNode:= Doc.CreateElement(elementname);
+  ValueNode:= Doc.CreateTextNode(value);
+  ParentNode.AppendChild(ValueNode);
+  RootNode.AppendChild(ParentNode);
 end;
 
 end.
