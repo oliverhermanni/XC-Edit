@@ -316,7 +316,8 @@ begin
 end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-var SaveDoc: LongInt;
+var
+  SaveDoc: LongInt;
 begin
   CanClose := true;
   if ActiveEditor.Modified then
@@ -438,7 +439,8 @@ begin
 end;
 
 procedure TFormMain.ReadIniFile;
-var Ini : TIniFile;
+var
+  Ini : TIniFile;
 begin
   Ini := TIniFile.Create(GetAppConfigFile(false));
   with FormMain do begin
@@ -456,7 +458,8 @@ begin
 end;
 
 procedure TFormMain.SaveIniFile;
-var Ini: TIniFile;
+var
+  Ini: TIniFile;
 begin
   Ini := TIniFile.Create(GetAppConfigFile(false));
   with Ini do begin
@@ -477,8 +480,9 @@ begin
 end;
 
 procedure TFormMain.CreateNewTab;
-var tab: TTabSheet;
-    Editor: TXCSynEdit;
+var
+  tab: TTabSheet;
+  Editor: TXCSynEdit;
 begin
   tab := pagesEditor.AddTabSheet;
   with tab do begin
@@ -495,11 +499,12 @@ begin
 end;
 
 function TFormMain.CompileCurrentFile:boolean;
-var Run: TProcess;
-    Ini : TIniFile;
-    AStringList : TStringList;
-    Compiler, SourceToCompile, DestFilename: String;
-    compilerInfo, errorInfo: string;
+var
+  Run: TProcess;
+  Ini : TIniFile;
+  AStringList : TStringList;
+  Compiler, SourceToCompile, DestFilename: String;
+  compilerInfo, errorInfo: string;
 begin
   // No filename defined
   if SaveEditor(ActiveEditor.Filename = '') = false then
@@ -584,9 +589,10 @@ begin
 end;
 
 procedure TFormMain.CloseTab;
-var tab: TTabSheet;
-    CanClose: Boolean;
-    msgReply: LongInt;
+var
+  tab: TTabSheet;
+  CanClose: Boolean;
+  msgReply: LongInt;
 begin
   tab := pagesEditor.ActivePage;
   CanClose := true;
