@@ -103,6 +103,7 @@ type
     procedure MenuEditPasteClick(Sender: TObject);
     procedure MenuEditRedoClick(Sender: TObject);
     procedure MenuEditUndoClick(Sender: TObject);
+    procedure MenuFileExitClick(Sender: TObject);
     procedure MenuFileNewFileClick(Sender: TObject);
     procedure MenuFileNewProjectClick(Sender: TObject);
     procedure MenuFileOpenClick(Sender: TObject);
@@ -157,14 +158,19 @@ begin
 end;
 
 procedure TFormMain.MenuFileOpenClick(Sender: TObject);
+var
+  i : integer;
+  FName : string;
 begin
   if OpenDialog.Execute then
   begin
-    if ActiveEditor.Text.Length > 0 then CreateNewTab;
-    ActiveEditor.Lines.LoadFromFile(OpenDialog.Filename);
-    pagesEditor.ActivePage.Caption := ExtractFileName(OpenDialog.Filename);
-    ActiveEditor.Filename := OpenDialog.Filename;
-    StatusBar.Panels[0].Text:= OpenDialog.Filename;
+    for i := 0 to OpenDialog.Files.Count - 1 do begin
+      if ActiveEditor.Text.Length > 0 then CreateNewTab;
+      FName := OpenDialog.Files[i];
+      ActiveEditor.Lines.LoadFromFile(FName);
+      pagesEditor.ActivePage.Caption := ExtractFileName(FName);
+      ActiveEditor.Filename := FName;
+    end;
   end;
 end;
 
@@ -405,6 +411,11 @@ end;
 procedure TFormMain.MenuEditUndoClick(Sender: TObject);
 begin
  ActiveEditor.Undo
+end;
+
+procedure TFormMain.MenuFileExitClick(Sender: TObject);
+begin
+  Close;
 end;
 
 function TFormMain.SaveEditor(WithDialog: boolean): boolean;

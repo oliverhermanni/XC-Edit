@@ -340,6 +340,7 @@ object FormMain: TFormMain
       object MenuFileExit: TMenuItem
         Caption = 'E&xit'
         ImageIndex = 5
+        OnClick = MenuFileExitClick
       end
     end
     object MenuEdit: TMenuItem
@@ -443,12 +444,14 @@ object FormMain: TFormMain
   object SaveDialog: TSaveDialog
     DefaultExt = '.*.bas'
     Filter = 'XC=BASIC source (*.bas)|*.bas|All files (*.*)|*.*'
+    Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing]
     left = 280
     top = 96
   end
   object OpenDialog: TOpenDialog
     DefaultExt = '.*.bas'
     Filter = 'XC=BASIC source (*.bas)|*.bas|All files (*.*)|*.*'
+    Options = [ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing]
     left = 280
     top = 152
   end
