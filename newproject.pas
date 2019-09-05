@@ -28,10 +28,11 @@ type
     Panel1: TPanel;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonOkClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
 
   public
-
+    var ProjectFile: TXCProjectFile;
   end;
 
 var
@@ -51,9 +52,9 @@ end;
 procedure TFormNewProject.ButtonOkClick(Sender: TObject);
 var
   xcp: TXCProjectFile;
+
 begin
-  xcp := TXCProjectFile.Create;
-  xcp.CreateProject(
+  ProjectFile.CreateProject(
     EditProjectName.Text,
     EditAuthor.Text,
     MemoComment.Lines.Text,
@@ -61,6 +62,12 @@ begin
     EditExecutable.Text
   );
   Close;
+end;
+
+procedure TFormNewProject.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+
 end;
 
 end.

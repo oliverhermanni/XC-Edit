@@ -8,6 +8,7 @@ object FormNewProject: TFormNewProject
   ClientHeight = 369
   ClientWidth = 315
   FormStyle = fsStayOnTop
+  OnClose = FormClose
   Position = poMainFormCenter
   LCLVersion = '2.0.4.0'
   object EditProjectName: TEdit
@@ -48,7 +49,7 @@ object FormNewProject: TFormNewProject
     Left = 16
     Height = 15
     Top = 64
-    Width = 89
+    Width = 90
     Caption = 'Executable name'
     ParentColor = False
   end

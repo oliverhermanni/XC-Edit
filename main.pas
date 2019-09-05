@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
-  ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process,
-  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo,
-  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf;
+  ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process, CommCtrl,
+  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo, xcprojectfile,
+  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf, laz2_DOM, laz2_XMLRead, laz2_XMLWrite;
 
 type
 
@@ -18,10 +18,15 @@ type
     FindDialog: TFindDialog;
     ImageList: TImageList;
     ImageListBookmark: TImageList;
-    MenuFileNewProject: TMenuItem;
     MenuHelp: TMenuItem;
-    MenuItem1: TMenuItem;
+    MenuHelpXCBasic: TMenuItem;
     MenuHelpAbout: TMenuItem;
+    MenuFileNew: TMenuItem;
+    MenuFileNewFile: TMenuItem;
+    MenuFileNewProject: TMenuItem;
+    MenuHelpHomepage: TMenuItem;
+    N8: TMenuItem;
+    MenuProject: TMenuItem;
     N7: TMenuItem;
     N6: TMenuItem;
     popupOutputSaveToFile: TMenuItem;
@@ -37,7 +42,6 @@ type
     RolloutOutput: TJvRollOut;
     MainMenu: TMainMenu;
     MenuFile: TMenuItem;
-    MenuFileNewFile: TMenuItem;
     MenuFileOpen: TMenuItem;
     MenuFileSave: TMenuItem;
     MenuFileSaveAs: TMenuItem;
@@ -53,7 +57,7 @@ type
     MenuEditOptions: TMenuItem;
     MenuFileClose: TMenuItem;
     MenuProjectCompile: TMenuItem;
-    MenuProject: TMenuItem;
+    MenuBuild: TMenuItem;
     N4: TMenuItem;
     N3: TMenuItem;
     N2: TMenuItem;
@@ -95,7 +99,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure MenuEditFindClick(Sender: TObject);
     procedure MenuEditReplaceClick(Sender: TObject);
-    procedure MenuFileClick(Sender: TObject);
     procedure MenuFileCloseClick(Sender: TObject);
     procedure MenuEditCopyClick(Sender: TObject);
     procedure MenuEditCutClick(Sender: TObject);
@@ -110,7 +113,8 @@ type
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
     procedure MenuHelpAboutClick(Sender: TObject);
-    procedure MenuItem1Click(Sender: TObject);
+    procedure MenuHelpHomepageClick(Sender: TObject);
+    procedure MenuHelpXCBasicClick(Sender: TObject);
     procedure MenuProjectCompileAndRunClick(Sender: TObject);
     procedure MenuProjectCompileClick(Sender: TObject);
     procedure MenuProjectUseTestCompilerClick(Sender: TObject);
@@ -124,17 +128,18 @@ type
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
   public
+    var ProjectFile: TXCProjectFile;
+    var ProcessEmulator: TProcess;
+    var CloseEmulator: Boolean;
     function ActiveEditor: TXCSynEdit;
     function SaveEditor(WithDialog: boolean): boolean;
     procedure ReadIniFile;
     procedure SaveIniFile;
     procedure CreateNewTab;
-    procedure CloseTab;
+    procedure CloseTab(idx: integer = -1);
     function CompileCurrentFile: boolean;
     procedure RunInEmulator;
     procedure WriteToOutputField(txt: string);
-    var ProcessEmulator: TProcess;
-    var CloseEmulator: Boolean;
   end;
 
 var
@@ -154,7 +159,11 @@ end;
 
 procedure TFormMain.MenuFileNewProjectClick(Sender: TObject);
 begin
-  FormNewProject.Show;
+  FormNewProject.ProjectFile := ProjectFile;
+  FormNewProject.ShowModal;
+  if FormNewProject.Showing = false then begin
+    WriteToOutputField(ProjectFile.FName);
+  end;
 end;
 
 procedure TFormMain.MenuFileOpenClick(Sender: TObject);
@@ -186,10 +195,15 @@ end;
 
 procedure TFormMain.MenuHelpAboutClick(Sender: TObject);
 begin
-  FormAbout.Show;
+  FormAbout.ShowModal;
 end;
 
-procedure TFormMain.MenuItem1Click(Sender: TObject);
+procedure TFormMain.MenuHelpHomepageClick(Sender: TObject);
+begin
+      OpenURL('https://hamrath.itch.io/xcedit');
+end;
+
+procedure TFormMain.MenuHelpXCBasicClick(Sender: TObject);
 begin
     OpenURL('https://xc-basic.net/doku.php');
 end;
@@ -230,8 +244,15 @@ end;
 
 procedure TFormMain.pagesEditorMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+var
+  tabindex: Integer;
 begin
-  if Button = mbMiddle then CloseTab;
+  if Button = mbMiddle then begin
+    tabindex := pagesEditor.IndexOfTabAt(X, Y);
+    if tabindex > -1 then begin
+      CloseTab(tabindex);
+    end;
+  end;
 end;
 
 procedure TFormMain.popupOutputClearClick(Sender: TObject);
@@ -353,6 +374,7 @@ end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
+  ProjectFile := TXCProjectFile.Create;
   ReadIniFile;
   hlt := TSynFacilSyn.Create(Self);
   hlt.LoadFromFile(ExtractFilePath(Application.ExeName) + DirectorySeparator + 'synxcbasic.xml');
@@ -373,11 +395,6 @@ begin
   ReplaceDialog.Execute
 end;
 
-procedure TFormMain.MenuFileClick(Sender: TObject);
-begin
-
-end;
-
 procedure TFormMain.MenuFileCloseClick(Sender: TObject);
 begin
   CloseTab
@@ -396,7 +413,7 @@ end;
 procedure TFormMain.MenuEditOptionsClick(Sender: TObject);
 begin
   FormOptions.ActiveEditor := ActiveEditor;
-  FormOptions.Show;
+  FormOptions.ShowModal;
 end;
 
 procedure TFormMain.MenuEditPasteClick(Sender: TObject);
@@ -588,15 +605,19 @@ begin
   richOutput.Lines.Add(txt);
 end;
 
-procedure TFormMain.CloseTab;
+procedure TFormMain.CloseTab(idx: integer = -1);
 var
   tab: TTabSheet;
   CanClose: Boolean;
   msgReply: LongInt;
 begin
+  if idx > -1 then begin
+    pagesEditor.ActivePage := pagesEditor.Pages[idx];
+  end;
   tab := pagesEditor.ActivePage;
+
   CanClose := true;
-  if Assigned(tab) and (pagesEditor.Pagecount > 1) then begin
+  if Assigned(tab) then begin
     if ActiveEditor.Modified then begin
       msgReply := Application.MessageBox('Do you want to save your latest changes?', 'Editor modified',  MB_ICONQUESTION + MB_YESNO);
       case msgReply of
@@ -606,7 +627,10 @@ begin
             CanClose := true;
       end;
     end;
-    if CanClose then tab.Free;
+    if CanClose then begin
+      CreateNewTab;
+      tab.Free;
+    end;
   end;
 end;
 

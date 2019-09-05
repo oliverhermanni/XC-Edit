@@ -11,9 +11,11 @@ const __VERSION__ = '1.0';
 
   type TXCProjectFile = class
     private
+      var sFName: string;
     public
+      property FName: string read sFName write sFName;
       procedure CreateProject(name, author, comment, folder, executable: string);
-      procedure CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string);
+      procedure CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string; CDATA: boolean = false);
   end;
 
 implementation
@@ -32,13 +34,13 @@ begin
     // Version of current project (not required for now)
     CreateNode(Doc, RootNode, 'Version', __VERSION__);
     // Name of Project
-    CreateNode(Doc, RootNode, 'Name', name);
+    CreateNode(Doc, RootNode, 'Name', name, true);
     // author
-    CreateNode(Doc, RootNode, 'Author', author);
+    CreateNode(Doc, RootNode, 'Author', author, true);
     // comment
-    CreateNode(Doc, RootNode, 'Comment', comment);
+    CreateNode(Doc, RootNode, 'Comment', comment, true);
     // folder
-    CreateNode(Doc, RootNode, 'Folder', folder);
+    CreateNode(Doc, RootNode, 'Folder', folder, true);
     // executable
     CreateNode(Doc, RootNode, 'Executable', executable + '.prg');
 
@@ -49,25 +51,31 @@ begin
     FilesNode := Doc.CreateElement('File');
     // filename
     CreateNode(Doc, FilesNode, 'Filename', executable + '.bas');
-    CreateNode(Doc, FilesNode, 'Folder', folder);
+    CreateNode(Doc, FilesNode, 'Folder', folder, true);
     CreateNode(Doc, FilesNode, 'IncludeInBuild', '1');
     CreateNode(Doc, FilesNode, 'FileOpen', '1');
 
     ParentNode.AppendChild(FilesNode);
     RootNode.AppendChild(ParentNode);
 
-    writeXMLFile(Doc, folder + DirectorySeparator + name + '.xcprj');
+    FName := folder + DirectorySeparator + name + '.xcprj';
+    writeXMLFile(Doc, FName);
   finally
     Doc.Free;
   end;
 end;
 
-procedure TXCProjectFile.CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string);
+procedure TXCProjectFile.CreateNode(Doc: TXMLDocument; RootNode: TDOMNode; elementname, value: string; CDATA: boolean = false);
 var
   ParentNode, ValueNode: TDOMNode;
 begin
   ParentNode:= Doc.CreateElement(elementname);
-  ValueNode:= Doc.CreateTextNode(value);
+  if CDATA = true then begin
+    ValueNode:= Doc.CreateCDATASection(value);
+  end else begin
+    ValueNode:= Doc.CreateTextNode(value);
+  end;
+
   ParentNode.AppendChild(ValueNode);
   RootNode.AppendChild(ParentNode);
 end;
