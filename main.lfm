@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 473
+  Left = 495
   Height = 609
-  Top = 259
+  Top = 195
   Width = 800
   Caption = 'XC=Edit'
   ClientHeight = 589
@@ -35,9 +35,9 @@ object FormMain: TFormMain
     object tbNew: TToolButton
       Left = 1
       Top = 2
-      Caption = 'New &file'
+      Caption = '&New'
       ImageIndex = 0
-      MenuItem = MenuFileNewFile
+      MenuItem = MenuFileNew
     end
     object tbOpen: TToolButton
       Left = 24
@@ -159,13 +159,6 @@ object FormMain: TFormMain
       Style = tbsCheck
     end
   end
-  object Splitter1: TSplitter
-    Left = 179
-    Height = 358
-    Top = 24
-    Width = 5
-    Visible = False
-  end
   object RolloutOutput: TJvRollOut
     Left = 0
     Height = 179
@@ -177,7 +170,7 @@ object FormMain: TFormMain
     Caption = 'Output'
     Colors.ButtonColor = clHighlight
     Colors.Color = clNone
-    TabOrder = 3
+    TabOrder = 2
     FAWidth = 145
     FAHeight = 179
     FCWidth = 22
@@ -203,6 +196,7 @@ object FormMain: TFormMain
           Width = 790
           Align = alClient
           HideSelection = False
+          OnSelectionChange = richOutputSelectionChange
           PopupMenu = popupOutput
           ReadOnly = True
           ScrollBars = ssAutoBoth
@@ -222,76 +216,22 @@ object FormMain: TFormMain
     ResizeAnchor = akBottom
   end
   object pagesEditor: TPageControl
-    Left = 184
+    Left = 5
     Height = 358
     Top = 24
-    Width = 616
+    Width = 795
     Align = alClient
-    TabOrder = 5
+    TabOrder = 4
     OnChange = pagesEditorChange
+    OnGetSiteInfo = pagesEditorGetSiteInfo
     OnMouseDown = pagesEditorMouseDown
   end
-  object PageControl1: TPageControl
+  object Splitter1: TSplitter
     Left = 0
     Height = 358
     Top = 24
-    Width = 179
-    ActivePage = tabProject
-    Align = alLeft
-    TabIndex = 0
-    TabOrder = 6
-    TabPosition = tpLeft
-    object tabProject: TTabSheet
-      Caption = 'Project'
-      ClientHeight = 350
-      ClientWidth = 148
-      object TreeView1: TTreeView
-        Left = 0
-        Height = 324
-        Top = 26
-        Width = 148
-        Align = alClient
-        BorderStyle = bsNone
-        ExpandSignColor = clNone
-        TabOrder = 0
-        Items.Data = {
-          F9FFFFFF020001000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000
-          0000000500000046696C6573
-        }
-      end
-      object Panel1: TPanel
-        Left = 0
-        Height = 26
-        Top = 0
-        Width = 148
-        Align = alTop
-        BevelOuter = bvSpace
-        ClientHeight = 26
-        ClientWidth = 148
-        TabOrder = 1
-        object SpeedButton1: TSpeedButton
-          Left = 1
-          Height = 24
-          Top = 1
-          Width = 23
-          Align = alLeft
-        end
-        object SpeedButton2: TSpeedButton
-          Left = 24
-          Height = 24
-          Top = 1
-          Width = 23
-          Align = alLeft
-        end
-        object SpeedButton3: TSpeedButton
-          Left = 124
-          Height = 24
-          Top = 1
-          Width = 23
-          Align = alRight
-        end
-      end
-    end
+    Width = 5
+    Visible = False
   end
   object MainMenu: TMainMenu
     Images = ImageList
@@ -301,16 +241,8 @@ object FormMain: TFormMain
       Caption = '&File'
       object MenuFileNew: TMenuItem
         Caption = '&New'
-        object MenuFileNewFile: TMenuItem
-          Caption = 'New &file'
-          ImageIndex = 0
-          ShortCut = 16462
-          OnClick = MenuFileNewFileClick
-        end
-        object MenuFileNewProject: TMenuItem
-          Caption = 'New &project...'
-          OnClick = MenuFileNewProjectClick
-        end
+        ImageIndex = 0
+        OnClick = MenuFileNewClick
       end
       object MenuFileClose: TMenuItem
         Caption = '&Close'
@@ -457,7 +389,7 @@ object FormMain: TFormMain
   object SaveDialog: TSaveDialog
     DefaultExt = '.*.bas'
     Filter = 'XC=BASIC source (*.bas)|*.bas|All files (*.*)|*.*'
-    Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Options = [ofPathMustExist, ofEnableSizing]
     left = 280
     top = 96
   end
@@ -1381,6 +1313,11 @@ object FormMain: TFormMain
   object popupOutput: TPopupMenu
     left = 440
     top = 472
+    object popupOutputCopy: TMenuItem
+      Caption = 'Copy to clip&board'
+      Enabled = False
+      OnClick = popupOutputCopyClick
+    end
     object popupOutputClear: TMenuItem
       Caption = '&Clear'
       OnClick = popupOutputClearClick

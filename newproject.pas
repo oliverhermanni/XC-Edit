@@ -50,9 +50,6 @@ begin
 end;
 
 procedure TFormNewProject.ButtonOkClick(Sender: TObject);
-var
-  xcp: TXCProjectFile;
-
 begin
   ProjectFile.CreateProject(
     EditProjectName.Text,

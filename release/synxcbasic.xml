@@ -17,8 +17,8 @@
     <Keyword>
         abs asm atn
         cast call charat const cos curpos 
-        data dec deek dim doke
-        else end endif endproc endwhile
+        data dec deek dim disableirq doke
+        enableirq else end endif endproc endwhile
         ferr for 
         gosub goto
         if inc incbin include inkey input

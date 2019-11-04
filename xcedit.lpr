@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazcontrols, main, options, xcsynedit, newproject, xcprojectfile,
+  Forms, lazcontrols, main, options, xcsynedit,
   about;
 
 {$R *.res}
@@ -18,7 +18,6 @@ begin
   Application.Initialize;
   Application.CreateForm(TFormMain, FormMain);
   Application.CreateForm(TFormOptions, FormOptions);
-  Application.CreateForm(TFormNewProject, FormNewProject);
   Application.CreateForm(TFormAbout, FormAbout);
   Application.Run;
 end.

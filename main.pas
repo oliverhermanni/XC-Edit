@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process, CommCtrl,
   LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo, xcprojectfile,
-  SynFacilHighlighter, SynEditTypes, newproject, about, LCLIntf, laz2_DOM, laz2_XMLRead, laz2_XMLWrite;
+  SynFacilHighlighter, SynEditTypes, about, LCLIntf, Types;
 
 type
 
@@ -22,9 +22,8 @@ type
     MenuHelpXCBasic: TMenuItem;
     MenuHelpAbout: TMenuItem;
     MenuFileNew: TMenuItem;
-    MenuFileNewFile: TMenuItem;
-    MenuFileNewProject: TMenuItem;
     MenuHelpHomepage: TMenuItem;
+    popupOutputCopy: TMenuItem;
     N8: TMenuItem;
     MenuProject: TMenuItem;
     N7: TMenuItem;
@@ -34,8 +33,6 @@ type
     N5: TMenuItem;
     MenuProjectUseTestCompiler: TMenuItem;
     MenuProjectCompileAndRun: TMenuItem;
-    PageControl1: TPageControl;
-    Panel1: TPanel;
     popupOutput: TPopupMenu;
     ReplaceDialog: TReplaceDialog;
     richOutput: TRichMemo;
@@ -66,14 +63,10 @@ type
     PageControl2: TPageControl;
     pagesEditor: TPageControl;
     SaveDialog: TSaveDialog;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
-    SpeedButton3: TSpeedButton;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     StatusBar: TStatusBar;
     TabOutput: TTabSheet;
-    tabProject: TTabSheet;
     ToolBar: TToolBar;
     tbNew: TToolButton;
     tbOpen: TToolButton;
@@ -92,7 +85,6 @@ type
     tbUseTestCompiler: TToolButton;
     ToolButton6: TToolButton;
     tbCompile: TToolButton;
-    TreeView1: TTreeView;
     procedure FindDialogFind(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -107,8 +99,7 @@ type
     procedure MenuEditRedoClick(Sender: TObject);
     procedure MenuEditUndoClick(Sender: TObject);
     procedure MenuFileExitClick(Sender: TObject);
-    procedure MenuFileNewFileClick(Sender: TObject);
-    procedure MenuFileNewProjectClick(Sender: TObject);
+    procedure MenuFileNewClick(Sender: TObject);
     procedure MenuFileOpenClick(Sender: TObject);
     procedure MenuFileSaveAsClick(Sender: TObject);
     procedure MenuFileSaveClick(Sender: TObject);
@@ -119,12 +110,16 @@ type
     procedure MenuProjectCompileClick(Sender: TObject);
     procedure MenuProjectUseTestCompilerClick(Sender: TObject);
     procedure pagesEditorChange(Sender: TObject);
+    procedure pagesEditorGetSiteInfo(Sender: TObject; DockClient: TControl;
+      var InfluenceRect: TRect; MousePos: TPoint; var CanDock: Boolean);
     procedure pagesEditorMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure popupOutputClearClick(Sender: TObject);
+    procedure popupOutputCopyClick(Sender: TObject);
     procedure popupOutputSaveToFileClick(Sender: TObject);
     procedure ReplaceDialogFind(Sender: TObject);
     procedure ReplaceDialogReplace(Sender: TObject);
+    procedure richOutputSelectionChange(Sender: TObject);
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
   public
@@ -151,20 +146,6 @@ implementation
 {$R *.lfm}
 
 { TFormMain }
-
-procedure TFormMain.MenuFileNewFileClick(Sender: TObject);
-begin
- CreateNewTab;
-end;
-
-procedure TFormMain.MenuFileNewProjectClick(Sender: TObject);
-begin
-  FormNewProject.ProjectFile := ProjectFile;
-  FormNewProject.ShowModal;
-  if FormNewProject.Showing = false then begin
-    WriteToOutputField(ProjectFile.FName);
-  end;
-end;
 
 procedure TFormMain.MenuFileOpenClick(Sender: TObject);
 var
@@ -242,6 +223,13 @@ begin
   StatusBar.Panels[0].Text:= ActiveEditor.Filename;
 end;
 
+procedure TFormMain.pagesEditorGetSiteInfo(Sender: TObject;
+  DockClient: TControl; var InfluenceRect: TRect; MousePos: TPoint;
+  var CanDock: Boolean);
+begin
+
+end;
+
 procedure TFormMain.pagesEditorMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
@@ -258,6 +246,11 @@ end;
 procedure TFormMain.popupOutputClearClick(Sender: TObject);
 begin
   richOutput.Lines.Clear;
+end;
+
+procedure TFormMain.popupOutputCopyClick(Sender: TObject);
+begin
+  richOutput.CopyToClipboard;
 end;
 
 procedure TFormMain.popupOutputSaveToFileClick(Sender: TObject);
@@ -308,6 +301,11 @@ begin
       Include(SearchOptions, ssoEntireScope);
     ActiveEditor.SearchReplace(FindText, ReplaceText, SearchOptions);
   end;
+end;
+
+procedure TFormMain.richOutputSelectionChange(Sender: TObject);
+begin
+  popupOutputCopy.Enabled:= richOutput.SelLength > 0;
 end;
 
 procedure TFormMain.SynEdit1StatusChange(Sender: TObject;
@@ -434,6 +432,11 @@ end;
 procedure TFormMain.MenuFileExitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TFormMain.MenuFileNewClick(Sender: TObject);
+begin
+  CreateNewTab;
 end;
 
 function TFormMain.SaveEditor(WithDialog: boolean): boolean;
@@ -628,7 +631,7 @@ begin
       end;
     end;
     if CanClose then begin
-      CreateNewTab;
+      if pagesEditor.PageCount = 1 then CreateNewTab;
       tab.Free;
     end;
   end;
