@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLType, Menus,
   ComCtrls, ExtCtrls, StdCtrls, Buttons, xcsynedit, INIFiles, Process, CommCtrl,
-  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo, xcprojectfile,
-  SynFacilHighlighter, SynEditTypes, about, LCLIntf, Types;
+  LazFileUtils, SynHighlighterXML, options, JvRollOut, RichMemo,
+  SynFacilHighlighter, SynEditTypes, about, LCLIntf, Types, XCSynHighlighter;
 
 type
 
@@ -123,7 +123,6 @@ type
     procedure SynEdit1StatusChange(Sender: TObject; Changes: TSynStatusChanges);
   private
   public
-    var ProjectFile: TXCProjectFile;
     var ProcessEmulator: TProcess;
     var CloseEmulator: Boolean;
     function ActiveEditor: TXCSynEdit;
@@ -372,7 +371,6 @@ end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  ProjectFile := TXCProjectFile.Create;
   ReadIniFile;
   hlt := TSynFacilSyn.Create(Self);
   hlt.LoadFromFile(ExtractFilePath(Application.ExeName) + DirectorySeparator + 'synxcbasic.xml');

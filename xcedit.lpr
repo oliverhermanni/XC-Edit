@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, lazcontrols, main, options, xcsynedit,
-  about;
+  about, xcsynhighlighter;
 
 {$R *.res}
 

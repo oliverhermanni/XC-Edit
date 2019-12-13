@@ -7,39 +7,40 @@
     "repeat&#xD;  &#xD;until"
     "while&#xD;  &#xD;endwhile"
     <Include Attribute="Keyword"></Include>
-    </Completion>
-    <Token CharsStart="$" Content = "0..9,." Attribute='NUMBER'></Token>
-    <Token CharsStart="0..9" Content = "0..9,." Attribute='NUMBER'></Token>
-    <String Start="&quot;" End="&quot;" > </String>
-    <Comment Start="rem" > </Comment>
-    <Comment Start=";" > </Comment>
-    <Comment Start="&apos;" > </Comment>
-    <Keyword>
-        abs asm atn
-        cast call charat const cos curpos 
-        data dec deek dim disableirq doke
-        enableirq else end endif endproc endwhile
-        ferr for 
-        gosub goto
-        if inc incbin include inkey input
-        let load lshift 
-        memcpy memset memshift
-        next  
-        on origin
-        peek poke pragma print proc 
-        repeat return rnd rshift
-        save sgn sin sqr strcmp strcpy strlen strncpy strpos sys
-        tan textat then
-        until usr 
-        val 
-        wait watch while 
-    </Keyword>
-    <Attribute Name="Keyword" ForeCol="#000000" Bold="True"></Attribute>
-    <Attribute Name="Number" ForeCol="#4040A0" Italic="True"></Attribute>
-    <Block Start="for" End="next" Folding="True"></Block>
-    <Block Start="if" End="endif" Folding="True"></Block>
-    <Block Start="proc" End="endproc" Folding="True"></Block>
-    <Block Start="repeat" End="until" Folding="True"></Block>
-    <Block Start="while" End="endwhile" Folding="True"></Block>
+  </Completion>
+  <Token CharsStart="0..9" Content="0..9,." Attribute="NUMBER"></Token>
+  <Token Start="$" Content="0..9A..fa..f" Attribute="NUMBER"> </Token>
+
+  <String Start="&quot;" End="&quot;" > </String>
+  <Comment Start="rem" > </Comment>
+  <Comment Start=";" > </Comment>
+  <Comment Start="&apos;" > </Comment>
+  <Keyword>
+      abs asm atn
+      cast call charat const cos curpos 
+      data dec deek dim disableirq doke
+      enableirq else end endif endproc endwhile
+      ferr for 
+      gosub goto
+      if inc incbin include inkey input
+      let load lshift 
+      memcpy memset memshift
+      next  
+      on origin
+      peek poke pragma print proc 
+      repeat return rnd rshift
+      save sgn sin sqr strcmp strcpy strlen strncpy strpos sys
+      tan textat then to
+      until usr 
+      val 
+      wait watch while 
+  </Keyword>
+  <Attribute Name="Keyword" ForeCol="#000000" Bold="True"></Attribute>
+  <Attribute Name="Number" ForeCol="#4040A0" Italic="True"></Attribute>
+  <Block Start="for" End="next" Folding="True"></Block>
+  <Block Start="if" End="endif" Folding="True"></Block>
+  <Block Start="proc" End="endproc" Folding="True"></Block>
+  <Block Start="repeat" End="until" Folding="True"></Block>
+  <Block Start="while" End="endwhile" Folding="True"></Block>
 
 </Language>
