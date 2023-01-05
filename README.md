@@ -19,7 +19,7 @@ After launching XC=Edit you need to select the XC=BASIC cross compiler. For this
 In the options you also need to choose an emulator to run compiled XC=BASIC programs. XC=BASIC is only tested with VICE.
 
 ## Get the latest compiled version
-Binary downloads will be provided at [itch.io](https://hamrath.itch.io/xcedit). Although XC=Edit should work fine on Linux and macOS, only Windows binaries are provided yet.
+~~Binary downloads will be provided at [itch.io]. Although XC=Edit should work fine on Linux and macOS, only Windows binaries are provided yet~~. Binary downloads are no longer available, as XC=Edit wasn't updated for a while.
 
 ## How to use XC=Edit
 After opening XC=Edit you are provided with an editor. You can write your XC=BASIC code and press `[F9]` to compile and run your code in the emulator. To just check if your code compiles you can press `[Ctrl+F9]`. To toggle between main and development compiler press `[Ctrl+F5]`.
